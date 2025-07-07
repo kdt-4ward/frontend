@@ -1,80 +1,19 @@
-import React, { useState, createContext } from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
-
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-
-interface User {
-  user_id: string;
-  name: string;
-  email: string;
-}
-
-// ✅ Context 타입 정의
-export const UserContext = createContext<{
-  userInfo: User | null;
-  setUserInfo: (user: User) => void;
-}>({
-  userInfo: null,
-  setUserInfo: () => {},
-});
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+import React, { useContext } from "react";
+import { Tabs, Redirect } from "expo-router";
+import { UserContext } from "../_layout";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const [userInfo, setUserInfo] = useState<User | null>(null);
+  const { userInfo } = useContext(UserContext);
+
+  // 로그인 안했으면 무조건 온보딩으로
+  if (!userInfo) {
+    return <Redirect href="/onboarding" />;
+  }
 
   return (
-    <UserContext.Provider value={{ userInfo, setUserInfo }}>
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-          headerShown: useClientOnlyValue(false, true),
-        }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Tab One',
-            tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-            headerRight: () => (
-              <Link href="/modal" asChild>
-                <Pressable>
-                  {({ pressed }) => (
-                    <FontAwesome
-                      name="info-circle"
-                      size={25}
-                      color={Colors[colorScheme ?? 'light'].text}
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
-              </Link>
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="two"
-          options={{
-            title: 'Tab Two',
-            tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          }}
-        />
-      </Tabs>
-    </UserContext.Provider>
+    <Tabs>
+      <Tabs.Screen name="one" options={{ title: "홈" }} />
+      <Tabs.Screen name="two" options={{ title: "탭2" }} />
+    </Tabs>
   );
 }
-
-
-
-
-

@@ -4,7 +4,7 @@ import Chat from '@/components/Chat';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import React, { useContext } from 'react';
-import { UserContext } from './_layout'; // ✅ Context에서 로그인 정보 가져오기
+import { UserContext } from '../_layout'; // ✅ Context에서 로그인 정보 가져오기
 
 export default function TabTwoScreen() {
   const { userInfo } = useContext(UserContext); // ✅ userInfo 상태 받아오기
