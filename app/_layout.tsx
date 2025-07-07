@@ -1,67 +1,32 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useColorScheme } from '@/components/useColorScheme';
-import { PostProvider } from '../context/PostContext';
+import React, { createContext, useState } from "react";
+import { Stack } from "expo-router";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+// User 타입 정의
+interface User {
+  user_id: string;
+  name: string;
+  email: string;
+}
 
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+// Context 생성
+export const UserContext = createContext<{
+  userInfo: User | null;
+  setUserInfo: (user: User | null) => void;
+}>({
+  userInfo: null,
+  setUserInfo: () => {},
+});
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+  const [userInfo, setUserInfo] = useState<User | null>(null);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <PostProvider>
-        <RootLayoutNav />
-      </PostProvider>
-    </GestureHandlerRootView>
-  );
-}
-//<ThemeProvider value={DefaultTheme}>
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}> 
-    {/* <ThemeProvider value={DefaultTheme}> */}
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+    <UserContext.Provider value={{ userInfo, setUserInfo }}>
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* 기본 루트에선 네비게이터 안보임, 각 라우트에서 보여줌 */}
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="(tabs)" />
       </Stack>
-    </ThemeProvider>
+    </UserContext.Provider>
   );
 }
